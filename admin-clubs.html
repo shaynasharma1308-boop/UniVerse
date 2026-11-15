@@ -1,0 +1,196 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Clubs - UniVerse</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <h2 class="logo">UniVerse.</h2>
+
+            <ul>
+                <li><a href="admin-dashboard.html">Dashboard</a></li>
+                <li><a href="index.html">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="dashboard">
+
+        <div class="dashboard-heading">
+            <p class="tagline">ADMIN PORTAL</p>
+            <h1>Manage Clubs</h1>
+            <p>Add and manage university club records.</p>
+        </div>
+
+        <div class="admin-form">
+
+            <h2>Add New Club</h2>
+
+            <form id="clubForm">
+
+                <input type="number" id="clubID" placeholder="Club ID" required>
+
+                <input type="text" id="clubName" placeholder="Club Name" required>
+
+                <input type="text" id="clubDescription" placeholder="Club Description" required>
+
+                <button type="submit">Add Club</button>
+
+            </form>
+
+        </div>
+
+        <div class="club-management">
+            <h2>Existing Clubs</h2>
+
+            <input type="text" id="adminClubSearch" placeholder="Search clubs...">
+
+            <div id="adminClubList"></div>
+        </div>
+
+    </section>
+
+    <footer>
+        <p>© 2026 UniVerse. All Rights Reserved.</p>
+    </footer>
+
+    
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const form = document.getElementById("clubForm");
+    const clubList = document.getElementById("adminClubList");
+    const searchBox = document.getElementById("adminClubSearch");
+
+    let clubs = JSON.parse(localStorage.getItem("clubs")) || [
+        {
+            id: 101,
+            name: "Technical Club",
+            description: "Technology and coding activities."
+        },
+        {
+            id: 102,
+            name: "Cultural Club",
+            description: "Dance, music and cultural events."
+        },
+        {
+            id: 103,
+            name: "Sports Club",
+            description: "Sports and tournaments."
+        }
+    ];
+
+    function displayClubs(searchValue = "") {
+
+        clubList.innerHTML = "";
+
+        let found = 0;
+
+        clubs.forEach(function(club) {
+
+            let details = (
+                club.name + " " + club.description
+            ).toLowerCase();
+
+            if (details.includes(searchValue.toLowerCase())) {
+
+                found++;
+
+                let card = document.createElement("div");
+                card.className = "admin-club-item";
+
+                let info = document.createElement("div");
+
+                let heading = document.createElement("h3");
+                heading.textContent = club.name;
+
+                let id = document.createElement("p");
+                id.textContent = "Club ID: " + club.id;
+
+                let description = document.createElement("p");
+                description.textContent = club.description;
+
+                info.appendChild(heading);
+                info.appendChild(id);
+                info.appendChild(description);
+
+                let deleteButton = document.createElement("button");
+                deleteButton.textContent = "Delete";
+
+                deleteButton.addEventListener("click", function() {
+
+                    clubs = clubs.filter(function(c) {
+                        return c.id !== club.id;
+                    });
+
+                    localStorage.setItem("clubs", JSON.stringify(clubs));
+
+                    displayClubs(searchBox.value);
+
+                });
+
+                card.appendChild(info);
+                card.appendChild(deleteButton);
+
+                clubList.appendChild(card);
+            }
+        });
+
+        if (found === 0) {
+            clubList.textContent = "No clubs found.";
+        }
+    }
+
+    form.addEventListener("submit", function(event) {
+
+        event.preventDefault();
+
+        let id = Number(document.getElementById("clubID").value);
+        let name = document.getElementById("clubName").value.trim();
+        let description = document.getElementById("clubDescription").value.trim();
+
+        if (clubs.some(function(c) {
+            return c.id === id;
+        })) {
+            alert("Club ID already exists!");
+            return;
+        }
+
+        clubs.push({
+            id: id,
+            name: name,
+            description: description
+        });
+
+        localStorage.setItem("clubs", JSON.stringify(clubs));
+
+        form.reset();
+
+        displayClubs(searchBox.value);
+
+        alert("Club added successfully!");
+
+    });
+
+    searchBox.addEventListener("input", function() {
+        displayClubs(searchBox.value);
+    });
+
+    if (!localStorage.getItem("clubs")) {
+        localStorage.setItem("clubs", JSON.stringify(clubs));
+    }
+
+    displayClubs();
+
+});
+</script>
+</body>
+</html>

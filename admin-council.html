@@ -1,0 +1,337 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Club Council - UniVerse</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <h2 class="logo">UniVerse.</h2>
+            <ul>
+                <li><a href="admin-dashboard.html">Dashboard</a></li>
+                <li><a href="index.html">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="dashboard">
+
+        <div class="dashboard-heading">
+            <p class="tagline">ADMIN PORTAL</p>
+            <h1>Manage Club Council</h1>
+            <p>Manage the student office bearers of each university club.</p>
+        </div>
+
+        <div class="admin-form">
+
+            <h2>Select Club</h2>
+
+            <select id="clubSelect" required>
+                <option value="">Choose a club</option>
+            </select>
+
+            <h2>Office Bearers</h2>
+
+            <form id="councilForm">
+
+                <div id="officeBearers"></div>
+
+                <h2>Club Heads</h2>
+
+                <p>Add as many heads as required with their own designations.</p>
+
+                <div id="headsList"></div>
+
+                <button type="button" id="addHeadButton">
+                    + Add Another Head
+                </button>
+
+                <button type="submit">Save Club Council</button>
+
+            </form>
+
+            <p id="message"></p>
+
+        </div>
+
+    </section>
+
+    <footer>
+        <p>© 2026 UniVerse. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function() {
+
+            const clubSelect = document.getElementById("clubSelect");
+            const councilForm = document.getElementById("councilForm");
+            const officeBearers = document.getElementById("officeBearers");
+            const headsList = document.getElementById("headsList");
+            const message = document.getElementById("message");
+
+            let clubs = JSON.parse(localStorage.getItem("clubs")) || [];
+            let councils = JSON.parse(localStorage.getItem("clubCouncils")) || [];
+
+            const positions = [
+                "President",
+                "Vice President",
+                "Secretary",
+                "Treasurer"
+            ];
+
+            function loadClubs() {
+
+                clubs.forEach(function(club) {
+
+                    let option = document.createElement("option");
+                    option.value = club.id;
+                    option.textContent = club.name + " (" + club.id + ")";
+
+                    clubSelect.appendChild(option);
+
+                });
+
+            }
+
+            function createMemberFields(position, member = {}) {
+
+                let section = document.createElement("div");
+                section.className = "council-member-form";
+
+                let heading = document.createElement("h3");
+                heading.textContent = position;
+
+                section.appendChild(heading);
+
+                let designation = document.createElement("input");
+                designation.type = "hidden";
+                designation.value = position;
+
+                let name = document.createElement("input");
+                name.type = "text";
+                name.placeholder = "Student Name";
+                name.value = member.name || "";
+                name.required = true;
+
+                let studentID = document.createElement("input");
+                studentID.type = "text";
+                studentID.placeholder = "Student ID";
+                studentID.value = member.studentID || "";
+                studentID.required = true;
+
+                let department = document.createElement("input");
+                department.type = "text";
+                department.placeholder = "Department";
+                department.value = member.department || "";
+                department.required = true;
+
+                let year = document.createElement("input");
+                year.type = "text";
+                year.placeholder = "Year (e.g. 2nd Year)";
+                year.value = member.year || "";
+                year.required = true;
+
+                section.appendChild(name);
+                section.appendChild(studentID);
+                section.appendChild(department);
+                section.appendChild(year);
+
+                section.dataset.position = position;
+
+                return section;
+
+            }
+
+            function addHead(member = {}) {
+
+                let section = document.createElement("div");
+                section.className = "council-member-form";
+
+                let heading = document.createElement("h3");
+                heading.textContent = "Club Head";
+
+                let designation = document.createElement("input");
+                designation.type = "text";
+                designation.placeholder = "Head Designation (e.g. Technical Head)";
+                designation.value = member.designation || "";
+                designation.required = true;
+
+                let name = document.createElement("input");
+                name.type = "text";
+                name.placeholder = "Student Name";
+                name.value = member.name || "";
+                name.required = true;
+
+                let studentID = document.createElement("input");
+                studentID.type = "text";
+                studentID.placeholder = "Student ID";
+                studentID.value = member.studentID || "";
+                studentID.required = true;
+
+                let department = document.createElement("input");
+                department.type = "text";
+                department.placeholder = "Department";
+                department.value = member.department || "";
+                department.required = true;
+
+                let year = document.createElement("input");
+                year.type = "text";
+                year.placeholder = "Year";
+                year.value = member.year || "";
+                year.required = true;
+
+                let removeButton = document.createElement("button");
+                removeButton.type = "button";
+                removeButton.textContent = "Remove Head";
+
+                removeButton.addEventListener("click", function() {
+                    section.remove();
+                });
+
+                section.appendChild(heading);
+                section.appendChild(designation);
+                section.appendChild(name);
+                section.appendChild(studentID);
+                section.appendChild(department);
+                section.appendChild(year);
+                section.appendChild(removeButton);
+
+                headsList.appendChild(section);
+
+            }
+
+            function loadCouncil() {
+
+                officeBearers.innerHTML = "";
+                headsList.innerHTML = "";
+                message.textContent = "";
+
+                positions.forEach(function(position) {
+                    officeBearers.appendChild(createMemberFields(position));
+                });
+
+                let selectedID = Number(clubSelect.value);
+
+                let council = councils.find(function(item) {
+                    return Number(item.clubID) === selectedID;
+                });
+
+                if (council) {
+
+                    positions.forEach(function(position, index) {
+
+                        let member = council.officeBearers[position] || {};
+
+                        let section = officeBearers.children[index];
+
+                        section.children[1].value = member.name || "";
+                        section.children[2].value = member.studentID || "";
+                        section.children[3].value = member.department || "";
+                        section.children[4].value = member.year || "";
+
+                    });
+
+                    council.heads.forEach(function(member) {
+                        addHead(member);
+                    });
+
+                }
+
+            }
+
+            clubSelect.addEventListener("change", loadCouncil);
+
+            document.getElementById("addHeadButton").addEventListener("click", function() {
+                addHead();
+            });
+
+            councilForm.addEventListener("submit", function(event) {
+
+                event.preventDefault();
+
+                let clubID = Number(clubSelect.value);
+
+                if (!clubID) {
+                    alert("Please select a club first.");
+                    return;
+                }
+
+                let officeBearersData = {};
+
+                positions.forEach(function(position, index) {
+
+                    let section = officeBearers.children[index];
+
+                    officeBearersData[position] = {
+                        name: section.children[1].value.trim(),
+                        studentID: section.children[2].value.trim(),
+                        department: section.children[3].value.trim(),
+                        year: section.children[4].value.trim()
+                    };
+
+                });
+
+                let heads = [];
+
+                let headSections = headsList.querySelectorAll(".council-member-form");
+
+                headSections.forEach(function(section) {
+
+                    heads.push({
+                        designation: section.children[1].value.trim(),
+                        name: section.children[2].value.trim(),
+                        studentID: section.children[3].value.trim(),
+                        department: section.children[4].value.trim(),
+                        year: section.children[5].value.trim()
+                    });
+
+                });
+
+                let councilData = {
+                    clubID: clubID,
+                    officeBearers: officeBearersData,
+                    heads: heads
+                };
+
+                let existingIndex = councils.findIndex(function(item) {
+                    return Number(item.clubID) === clubID;
+                });
+
+                if (existingIndex !== -1) {
+                    councils[existingIndex] = councilData;
+                } else {
+                    councils.push(councilData);
+                }
+
+                localStorage.setItem("clubCouncils", JSON.stringify(councils));
+
+                message.textContent = "Club council saved successfully!";
+
+                alert("Club council saved successfully!");
+
+            });
+
+            loadClubs();
+
+            positions.forEach(function(position) {
+                officeBearers.appendChild(createMemberFields(position));
+            });
+
+            if (clubs.length === 0) {
+                message.textContent = "Please add clubs before managing their councils.";
+            }
+
+        });
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Council - UniVerse</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h2>UniVerse</h2>
+        <nav>
+            <a href="student-dashboard.html">Dashboard</a>
+            <a href="clubs.html">Clubs</a>
+        </nav>
+    </header>
+
+    <section class="page-container">
+        <h1>Club Student Councils</h1>
+        <p>Meet the student representatives of each club.</p>
+
+        <select id="clubSelect">
+            <option value="">Select a Club</option>
+        </select>
+
+        <div id="councilDisplay"></div>
+    </section>
+
+    <script>
+        const clubs = JSON.parse(localStorage.getItem("clubs")) || [];
+        const councils = JSON.parse(localStorage.getItem("clubCouncils")) || [];
+
+        const clubSelect = document.getElementById("clubSelect");
+        const councilDisplay = document.getElementById("councilDisplay");
+
+        clubs.forEach(club => {
+            const option = document.createElement("option");
+            option.value = club.id;
+            option.textContent = club.name;
+            clubSelect.appendChild(option);
+        });
+
+        clubSelect.addEventListener("change", function () {
+            const selectedID = this.value;
+
+            councilDisplay.innerHTML = "";
+
+            if (!selectedID) {
+                return;
+            }
+
+            const council = councils.find(
+                item => String(item.clubID) === String(selectedID)
+            );
+
+            if (!council) {
+                councilDisplay.innerHTML = "<p>No council details available for this club yet.</p>";
+                return;
+            }
+
+            const club = clubs.find(
+                item => String(item.id) === String(selectedID)
+            );
+
+            let html = `<h2>${club ? club.name : "Club"} Council</h2>`;
+
+            html += `<h3>Office Bearers</h3>`;
+            html += `<div class="council-grid">`;
+
+            Object.entries(council.officeBearers).forEach(([position, member]) => {
+                html += `
+                    <div class="council-card">
+                        <h3>${position}</h3>
+                        <p><strong>Name:</strong> ${member.name}</p>
+                        <p><strong>Student ID:</strong> ${member.studentID}</p>
+                        <p><strong>Department:</strong> ${member.department}</p>
+                        <p><strong>Year:</strong> ${member.year}</p>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+
+            html += `<h3>Club Heads</h3>`;
+            html += `<div class="council-grid">`;
+
+            if (council.heads && council.heads.length > 0) {
+                council.heads.forEach(member => {
+                    html += `
+                        <div class="council-card">
+                            <h3>${member.designation}</h3>
+                            <p><strong>Name:</strong> ${member.name}</p>
+                            <p><strong>Student ID:</strong> ${member.studentID}</p>
+                            <p><strong>Department:</strong> ${member.department}</p>
+                            <p><strong>Year:</strong> ${member.year}</p>
+                        </div>
+                    `;
+                });
+            } else {
+                html += `<p>No heads have been added yet.</p>`;
+            }
+
+            html += `</div>`;
+
+            councilDisplay.innerHTML = html;
+        });
+    </script>
+
+</body>
+</html>

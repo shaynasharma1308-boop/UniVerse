@@ -1,0 +1,142 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clubs Directory - UniVerse</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <h2 class="logo">UniVerse.</h2>
+
+            <ul>
+                <li><a href="student-dashboard.html">Dashboard</a></li>
+                <li><a href="index.html">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="dashboard">
+
+        <div class="dashboard-heading">
+            <p class="tagline">EXPLORE YOUR CAMPUS</p>
+            <h1>Clubs Directory</h1>
+            <p>Discover clubs, explore your interests and connect with communities.</p>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="clubSearch" placeholder="Search clubs...">
+        </div>
+
+        <div class="dashboard-cards" id="clubList">
+
+            <div class="dashboard-card">
+                <h2>Technical Club</h2>
+                <p>Explore technology, coding, programming and technical activities.</p>
+                <p><strong>Club ID:</strong> 101</p>
+                <p><strong>Coordinator:</strong> Faculty Member</p>
+            </div>
+
+            <div class="dashboard-card">
+                <h2>Cultural Club</h2>
+                <p>Participate in dance, music, drama and cultural events.</p>
+                <p><strong>Club ID:</strong> 102</p>
+                <p><strong>Coordinator:</strong> Faculty Member</p>
+            </div>
+
+            <div class="dashboard-card">
+                <h2>Sports Club</h2>
+                <p>Take part in sports activities, competitions and tournaments.</p>
+                <p><strong>Club ID:</strong> 103</p>
+                <p><strong>Coordinator:</strong> Faculty Member</p>
+            </div>
+
+            <div class="dashboard-card">
+                <h2>Literary Club</h2>
+                <p>Explore writing, reading, debates and creative expression.</p>
+                <p><strong>Club ID:</strong> 104</p>
+                <p><strong>Coordinator:</strong> Faculty Member</p>
+            </div>
+
+        </div>
+
+        <p id="noClubs" style="display:none; text-align:center; margin-top:30px;">
+            No clubs found.
+        </p>
+
+    </section>
+
+    <footer>
+        <p>© 2026 UniVerse. All Rights Reserved.</p>
+    </footer>
+
+   
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const clubList = document.getElementById("clubList");
+    const searchBox = document.getElementById("clubSearch");
+    const noClubs = document.getElementById("noClubs");
+
+    let clubs = JSON.parse(localStorage.getItem("clubs")) || [];
+
+    function displayClubs(searchValue = "") {
+
+        clubList.innerHTML = "";
+
+        let found = 0;
+
+        clubs.forEach(function(club) {
+
+            let details = (
+                club.name + " " + club.description + " " + club.id
+            ).toLowerCase();
+
+            if (details.includes(searchValue.toLowerCase())) {
+
+                found++;
+
+                let card = document.createElement("div");
+                card.className = "dashboard-card";
+
+                let heading = document.createElement("h2");
+                heading.textContent = club.name;
+
+                let description = document.createElement("p");
+                description.textContent = club.description;
+
+                let id = document.createElement("p");
+                id.innerHTML = "<strong>Club ID:</strong> ";
+                id.appendChild(document.createTextNode(club.id));
+
+                let coordinator = document.createElement("p");
+                coordinator.innerHTML = "<strong>Coordinator:</strong> Faculty Member";
+
+                card.appendChild(heading);
+                card.appendChild(description);
+                card.appendChild(id);
+                card.appendChild(coordinator);
+
+                clubList.appendChild(card);
+            }
+        });
+
+        noClubs.style.display = found === 0 ? "block" : "none";
+    }
+
+    searchBox.addEventListener("input", function() {
+        displayClubs(searchBox.value);
+    });
+
+    displayClubs();
+
+});
+</script>
+</body>
+</html>

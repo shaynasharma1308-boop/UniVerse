@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assign Coordinators - UniVerse</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <h2 class="logo">UniVerse.</h2>
+            <ul>
+                <li><a href="admin-dashboard.html">Dashboard</a></li>
+                <li><a href="index.html">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="dashboard">
+
+        <div class="dashboard-heading">
+            <p class="tagline">ADMIN PORTAL</p>
+            <h1>Assign Faculty Coordinators</h1>
+            <p>Connect university clubs with their faculty coordinators.</p>
+        </div>
+
+        <div class="admin-form">
+
+            <h2>Assign Coordinator</h2>
+
+            <form id="coordinatorForm">
+
+                <label for="clubSelect">Select Club</label>
+                <select id="clubSelect" required>
+                    <option value="">Choose a club</option>
+                </select>
+
+                <label for="facultySelect">Select Faculty</label>
+                <select id="facultySelect" required>
+                    <option value="">Choose a faculty member</option>
+                </select>
+
+                <button type="submit">Assign Coordinator</button>
+
+            </form>
+
+        </div>
+
+        <div class="club-management">
+
+            <h2>Current Assignments</h2>
+
+            <div id="assignmentList"></div>
+
+        </div>
+
+    </section>
+
+    <footer>
+        <p>© 2026 UniVerse. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function() {
+
+            const form = document.getElementById("coordinatorForm");
+            const clubSelect = document.getElementById("clubSelect");
+            const facultySelect = document.getElementById("facultySelect");
+            const assignmentList = document.getElementById("assignmentList");
+
+            let clubs = JSON.parse(localStorage.getItem("clubs")) || [];
+            let faculty = JSON.parse(localStorage.getItem("faculty")) || [];
+            let assignments = JSON.parse(localStorage.getItem("assignments")) || [];
+
+            function loadDropdowns() {
+
+                clubSelect.innerHTML = '<option value="">Choose a club</option>';
+                facultySelect.innerHTML = '<option value="">Choose a faculty member</option>';
+
+                clubs.forEach(function(club) {
+
+                    let option = document.createElement("option");
+
+                    option.value = club.id;
+                    option.textContent = club.name + " (" + club.id + ")";
+
+                    clubSelect.appendChild(option);
+
+                });
+
+                faculty.forEach(function(member) {
+
+                    let option = document.createElement("option");
+
+                    option.value = member.id;
+                    option.textContent = member.name + " (" + member.id + ")";
+
+                    facultySelect.appendChild(option);
+
+                });
+
+                if (clubs.length === 0) {
+                    clubSelect.innerHTML = '<option value="">No clubs available</option>';
+                }
+
+                if (faculty.length === 0) {
+                    facultySelect.innerHTML = '<option value="">No faculty available</option>';
+                }
+
+            }
+
+            function displayAssignments() {
+
+                assignmentList.innerHTML = "";
+
+                assignments = assignments.filter(function(item) {
+
+                    return clubs.some(function(club) {
+                        return Number(club.id) === Number(item.clubID);
+                    }) && faculty.some(function(member) {
+                        return Number(member.id) === Number(item.facultyID);
+                    });
+
+                });
+
+                localStorage.setItem("assignments", JSON.stringify(assignments));
+
+                assignments.forEach(function(item) {
+
+                    let club = clubs.find(function(c) {
+                        return Number(c.id) === Number(item.clubID);
+                    });
+
+                    let member = faculty.find(function(f) {
+                        return Number(f.id) === Number(item.facultyID);
+                    });
+
+                    let card = document.createElement("div");
+                    card.className = "assignment-item";
+
+                    let info = document.createElement("div");
+
+                    let heading = document.createElement("h3");
+                    heading.textContent = club.name;
+
+                    let clubID = document.createElement("p");
+                    clubID.textContent = "Club ID: " + club.id;
+
+                    let coordinator = document.createElement("p");
+                    coordinator.textContent = "Coordinator: " + member.name;
+
+                    let department = document.createElement("p");
+                    department.textContent = "Department: " + member.department;
+
+                    info.appendChild(heading);
+                    info.appendChild(clubID);
+                    info.appendChild(coordinator);
+                    info.appendChild(department);
+
+                    let button = document.createElement("button");
+                    button.type = "button";
+                    button.textContent = "Remove";
+
+                    button.addEventListener("click", function() {
+
+                        assignments = assignments.filter(function(a) {
+                            return Number(a.clubID) !== Number(item.clubID);
+                        });
+
+                        localStorage.setItem("assignments", JSON.stringify(assignments));
+
+                        displayAssignments();
+
+                    });
+
+                    card.appendChild(info);
+                    card.appendChild(button);
+
+                    assignmentList.appendChild(card);
+
+                });
+
+                if (assignments.length === 0) {
+                    assignmentList.textContent = "No coordinators assigned yet.";
+                }
+
+            }
+
+            form.addEventListener("submit", function(event) {
+
+                event.preventDefault();
+
+                let clubID = Number(clubSelect.value);
+                let facultyID = Number(facultySelect.value);
+
+                if (!clubID || !facultyID) {
+                    alert("Please select both club and faculty.");
+                    return;
+                }
+
+                let existing = assignments.find(function(item) {
+                    return Number(item.clubID) === clubID;
+                });
+
+                if (existing) {
+
+                    existing.facultyID = facultyID;
+
+                } else {
+
+                    assignments.push({
+                        clubID: clubID,
+                        facultyID: facultyID
+                    });
+
+                }
+
+                localStorage.setItem("assignments", JSON.stringify(assignments));
+
+                form.reset();
+
+                displayAssignments();
+
+                alert("Coordinator assigned successfully!");
+
+            });
+
+            loadDropdowns();
+            displayAssignments();
+
+        });
+
+    </script>
+
+</body>
+</html>

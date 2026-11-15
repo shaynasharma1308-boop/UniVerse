@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Announcements - UniVerse</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <h2 class="logo">UniVerse.</h2>
+
+            <ul>
+                <li><a href="student-dashboard.html">Dashboard</a></li>
+                <li><a href="index.html">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="dashboard">
+
+        <div class="dashboard-heading">
+            <p class="tagline">STUDENT PORTAL</p>
+            <h1>University Announcements</h1>
+            <p>Stay updated with the latest university news and notices.</p>
+        </div>
+
+        <div class="club-management">
+
+            <h2>Latest Announcements</h2>
+
+            <div id="studentAnnouncementList"></div>
+
+        </div>
+
+    </section>
+
+    <footer>
+        <p>© 2026 UniVerse. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        const announcements = JSON.parse(localStorage.getItem("announcements")) || [];
+
+        const announcementList = document.getElementById("studentAnnouncementList");
+
+        if (announcements.length === 0) {
+
+            announcementList.textContent = "No announcements available right now.";
+
+        } else {
+
+            announcements.slice().reverse().forEach(function(item) {
+
+                let card = document.createElement("div");
+                card.className = "assignment-item";
+
+                let details = document.createElement("div");
+
+                let heading = document.createElement("h3");
+                heading.textContent = item.title;
+
+                let description = document.createElement("p");
+                description.textContent = item.description;
+
+                let date = document.createElement("p");
+                date.textContent = "Date: " + item.date;
+
+                details.appendChild(heading);
+                details.appendChild(description);
+                details.appendChild(date);
+
+                card.appendChild(details);
+                announcementList.appendChild(card);
+
+            });
+        }
+    </script>
+
+</body>
+</html>

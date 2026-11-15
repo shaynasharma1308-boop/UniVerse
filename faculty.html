@@ -1,0 +1,147 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Directory - UniVerse</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <h2 class="logo">UniVerse.</h2>
+
+            <ul>
+                <li><a href="student-dashboard.html">Dashboard</a></li>
+                <li><a href="index.html">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="dashboard">
+
+        <div class="dashboard-heading">
+            <p class="tagline">MEET YOUR FACULTY</p>
+            <h1>Faculty Directory</h1>
+            <p>Explore faculty members and learn more about them.</p>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="facultySearch" placeholder="Search by name or department...">
+        </div>
+
+        <div class="dashboard-cards" id="facultyList">
+
+            <div class="dashboard-card">
+                <h2>Dr. Anil Sharma</h2>
+                <p><strong>Faculty ID:</strong> 201</p>
+                <p><strong>Department:</strong> CSE</p>
+                <p><strong>Designation:</strong> Professor</p>
+            </div>
+
+            <div class="dashboard-card">
+                <h2>Dr. Priya Verma</h2>
+                <p><strong>Faculty ID:</strong> 202</p>
+                <p><strong>Department:</strong> ECE</p>
+                <p><strong>Designation:</strong> Associate Professor</p>
+            </div>
+
+            <div class="dashboard-card">
+                <h2>Mr. Rahul Mehta</h2>
+                <p><strong>Faculty ID:</strong> 203</p>
+                <p><strong>Department:</strong> Civil</p>
+                <p><strong>Designation:</strong> Assistant Professor</p>
+            </div>
+
+            <div class="dashboard-card">
+                <h2>Dr. Neha Gupta</h2>
+                <p><strong>Faculty ID:</strong> 204</p>
+                <p><strong>Department:</strong> CSE</p>
+                <p><strong>Designation:</strong> Associate Professor</p>
+            </div>
+
+        </div>
+
+        <p id="noFaculty" style="display:none; text-align:center; margin-top:30px;">
+            No faculty members found.
+        </p>
+
+    </section>
+
+    <footer>
+        <p>© 2026 UniVerse. All Rights Reserved.</p>
+    </footer>
+
+    
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const facultyList = document.getElementById("facultyList");
+    const searchBox = document.getElementById("facultySearch");
+    const noFaculty = document.getElementById("noFaculty");
+
+    let faculty = JSON.parse(localStorage.getItem("faculty")) || [];
+
+    function displayFaculty(searchValue = "") {
+
+        facultyList.innerHTML = "";
+
+        let found = 0;
+
+        faculty.forEach(function(member) {
+
+            let details = (
+                member.name + " " +
+                member.department + " " +
+                member.designation + " " +
+                member.id
+            ).toLowerCase();
+
+            if (details.includes(searchValue.toLowerCase())) {
+
+                found++;
+
+                let card = document.createElement("div");
+                card.className = "dashboard-card";
+
+                let heading = document.createElement("h2");
+                heading.textContent = member.name;
+
+                let id = document.createElement("p");
+                id.innerHTML = "<strong>Faculty ID:</strong> ";
+                id.appendChild(document.createTextNode(member.id));
+
+                let department = document.createElement("p");
+                department.innerHTML = "<strong>Department:</strong> ";
+                department.appendChild(document.createTextNode(member.department));
+
+                let designation = document.createElement("p");
+                designation.innerHTML = "<strong>Designation:</strong> ";
+                designation.appendChild(document.createTextNode(member.designation));
+
+                card.appendChild(heading);
+                card.appendChild(id);
+                card.appendChild(department);
+                card.appendChild(designation);
+
+                facultyList.appendChild(card);
+            }
+        });
+
+        noFaculty.style.display = found === 0 ? "block" : "none";
+    }
+
+    searchBox.addEventListener("input", function() {
+        displayFaculty(searchBox.value);
+    });
+
+    displayFaculty();
+
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Announcements - UniVerse</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <h2 class="logo">UniVerse.</h2>
+
+            <ul>
+                <li><a href="admin-dashboard.html">Dashboard</a></li>
+                <li><a href="index.html">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="dashboard">
+
+        <div class="dashboard-heading">
+            <p class="tagline">ADMIN PORTAL</p>
+            <h1>Manage Announcements</h1>
+            <p>Share important university updates with students.</p>
+        </div>
+
+        <div class="admin-form">
+
+            <h2>Add New Announcement</h2>
+
+            <form id="announcementForm">
+
+                <label for="announcementTitle">Announcement Title</label>
+                <input type="text" id="announcementTitle"
+                    placeholder="Enter announcement title" required>
+
+                <label for="announcementDescription">Description</label>
+                <textarea id="announcementDescription"
+                    placeholder="Enter announcement details"
+                    rows="4" required></textarea>
+
+                <label for="announcementDate">Date</label>
+                <input type="date" id="announcementDate" required>
+
+                <button type="submit">Publish Announcement</button>
+
+            </form>
+
+        </div>
+
+        <div class="club-management">
+
+    <h2>Published Announcements</h2>
+
+    <div id="announcementList"></div>
+
+</div>
+    </section>
+
+    <footer>
+        <p>© 2026 UniVerse. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const form = document.getElementById("announcementForm");
+    const titleInput = document.getElementById("announcementTitle");
+    const descriptionInput = document.getElementById("announcementDescription");
+    const dateInput = document.getElementById("announcementDate");
+    const announcementList = document.getElementById("announcementList");
+
+    let announcements = JSON.parse(localStorage.getItem("announcements")) || [];
+
+    function displayAnnouncements() {
+
+        announcementList.innerHTML = "";
+
+        announcements.forEach(function(item, index) {
+
+            let card = document.createElement("div");
+            card.className = "assignment-item";
+
+            let details = document.createElement("div");
+
+            let heading = document.createElement("h3");
+            heading.textContent = item.title;
+
+            let description = document.createElement("p");
+            description.textContent = item.description;
+
+            let date = document.createElement("p");
+            date.textContent = "Date: " + item.date;
+
+            details.appendChild(heading);
+            details.appendChild(description);
+            details.appendChild(date);
+
+            let button = document.createElement("button");
+            button.textContent = "Delete";
+
+            button.onclick = function() {
+                announcements.splice(index, 1);
+                localStorage.setItem("announcements", JSON.stringify(announcements));
+                displayAnnouncements();
+            };
+
+            card.appendChild(details);
+            card.appendChild(button);
+
+            announcementList.appendChild(card);
+        });
+
+        if (announcements.length === 0) {
+            announcementList.textContent = "No announcements published yet.";
+        }
+    }
+
+    form.addEventListener("submit", function(event) {
+
+        event.preventDefault();
+
+        announcements.push({
+            title: titleInput.value,
+            description: descriptionInput.value,
+            date: dateInput.value
+        });
+
+        localStorage.setItem("announcements", JSON.stringify(announcements));
+
+        form.reset();
+        displayAnnouncements();
+
+        alert("Announcement published successfully!");
+
+    });
+
+    displayAnnouncements();
+
+});
+</script>
+
+</body>
+</html>
